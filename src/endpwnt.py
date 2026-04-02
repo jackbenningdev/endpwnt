@@ -1,12 +1,16 @@
+from pathlib import Path
+from parse_config import *
+from typing import Any
 import yaml
 
-class Endpwnt:
-    def __init__(self, filename):
+
+class EndPwnt:
+    def __init__(self, openapi_path, config_path):
         try:
-            with open(filename, "r", encoding="utf-8") as f:
+            with open(Path(openapi_path), "r", encoding="utf-8") as f:
                 spec = yaml.safe_load(f)
 
-            self.endpoints = []
+            self.endpoints : list[dict[str, str]] = []
 
             for path, methods in spec.get("paths", {}).items():
                 for method, details in methods.items():
@@ -18,6 +22,36 @@ class Endpwnt:
                     })
 
         except Exception as e:
-            print("could not import openAPI")
-        print(self.endpoints)
+            print("ERROR: Could not import openAPI")
+            raise e
+
+        try:
+            raw = yaml.safe_load(Path(config_path).read_text())
+            checks_raw = raw.get("checks", {})
+            enabled = checks_raw.get("enabled", [])
+            options = {k: v for k, v in checks_raw.items() if k != "enabled"}
+
+            self.app_config = AppConfig(
+                base_url=raw["base_url"],
+                timeouts=TimeoutsConfig(**raw.get("timeouts", {})),
+                request_defaults=RequestDefaultsConfig(**raw.get("request_defaults", {})),
+                auth_contexts=[AuthContext(**x) for x in raw.get("auth_contexts", [])],
+                endpoint_sources=EndpointSourcesConfig(**raw.get("endpoint_sources", {})),
+                checks=ChecksConfig(enabled=enabled, options=options),
+                reporting=ReportingConfig(**raw.get("reporting", {})),
+            )
+            print(self.app_config)
+
+        except Exception as e:
+            print("ERROR: could not import config")
+            raise e
+
+
+    def get_endpoints(self):
+        return self.endpoints
+
+    def print_endpoints(self):
+        for endpoint in self.endpoints:
+            print(endpoint)
+
 

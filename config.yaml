@@ -1,0 +1,66 @@
+base_url: "https://target.local"
+
+timeouts:
+  request_seconds: 10
+
+request_defaults:
+  headers:
+    User-Agent: "endpwnt/0.1.0"
+    Accept: "application/json"
+
+auth_contexts:
+  - name: "unauth"
+
+  - name: "user"
+    headers:
+      Authorization: "Bearer eyJ_user_token_here"
+
+  - name: "admin"
+    headers:
+      Authorization: "Bearer eyJ_admin_token_here"
+
+  - name: "session_user"
+    cookies:
+      sessionid: "abc123"
+
+endpoint_sources:
+  openapi: "openapi.json"
+  include_paths: []
+  exclude_paths:
+    - "/health"
+    - "/metrics"
+
+checks:
+  enabled:
+    - "missing_auth"
+    - "idor"
+    - "error_leakage"
+    - "method_exposure"
+    - "rate_limit"
+
+  missing_auth:
+    privileged_auth_names:
+      - "user"
+      - "admin"
+
+  idor:
+    candidate_param_names:
+      - "id"
+      - "userId"
+      - "accountId"
+      - "orderId"
+    test_values:
+      - "1"
+      - "2"
+      - "9999"
+
+  rate_limit:
+    attempts: 5
+    delay_ms: 250
+
+reporting:
+  format: "markdown"
+  output: "report.md"
+  include_request_headers: false
+  include_response_headers: true
+  max_body_chars: 500
