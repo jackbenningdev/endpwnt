@@ -12,9 +12,13 @@ from base_check import BaseCheck
 
 class EndPwnt:
     def __init__(self, openapi_path: str, config_path: str) -> None:
-        self.endpoints = self._load_openapi(openapi_path)
         self.app_config = self._load_config(config_path)
-        self.checks_classes =  [obj for name, obj in inspect.getmembers(checks_module, inspect.isclass)]
+        exclude = self.app_config.endpoint_sources.exclude_paths
+        self.endpoints = [ep for ep in self._load_openapi(openapi_path) if ep.path not in exclude]
+        self.checks_classes = [
+            obj for _, obj in inspect.getmembers(checks_module, inspect.isclass)
+            if issubclass(obj, BaseCheck) and obj is not BaseCheck
+        ]
 
     def _load_openapi(self, openapi_path: str) -> list[EndPoint]:
         try:
@@ -77,14 +81,16 @@ class EndPwnt:
             raise RuntimeError(f"Could not import config: {e}") from e
 
     def run_scan(self) -> List[Finding]:
-        complete_findings : list[Finding] = []
-        client = HttpClient(self.app_config.base_url, self.app_config.timeouts.request_seconds, self.app_config.request_defaults.headers)
+        complete_findings: list[Finding] = []
+        client = HttpClient(self.app_config.base_url, self.app_config.timeouts.request_seconds,
+                            self.app_config.request_defaults.headers)
+        enabled = set(self.app_config.checks.enabled)  # <-- add
         for endpoint in self.endpoints:
             for cls in self.checks_classes:
-                obj:BaseCheck = cls()
+                obj: BaseCheck = cls()
+                if obj.check_id not in enabled:  # <-- add
+                    continue  # <-- add
                 if obj.applies_to(endpoint):
-                    complete_findings += obj.run(endpoint, client, self.app_config.auth_contexts, self.app_config.checks.options)
-                    complete_findings += obj.run_other_methods(endpoint, client, self.app_config.auth_contexts)
-
-
+                    complete_findings += obj.run(endpoint, client, self.app_config.auth_contexts,
+                                                 self.app_config.checks.options)
         return complete_findings

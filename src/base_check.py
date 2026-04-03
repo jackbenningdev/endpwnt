@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from endpoint import EndPoint
 from client import HttpClient
+from typing import *
 
 class BaseCheck(ABC):
 
@@ -11,10 +12,10 @@ class BaseCheck(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def run(self, endpoint: EndPoint, client, auth_contexts, options: dict) -> bool:
+    def run(self, endpoint: EndPoint, client, auth_contexts, options: dict) -> list:
         raise NotImplementedError
 
-    def run_other_methods(self, endpoint:EndPoint, client:HttpClient, auth_context):
+    def run_other_methods(self, endpoint:EndPoint, client:HttpClient, auth_context) -> List[dict[str, str]]:
         findings = []
         METHODS_TO_PROBE = ["OPTIONS", "PUT", "PATCH", "DELETE"]
         for method in METHODS_TO_PROBE:
@@ -26,9 +27,11 @@ class BaseCheck(ABC):
                 path=endpoint.path,
                 summary=endpoint.summary,
                 operation_id=endpoint.operation_id,
+                parameters=endpoint.parameters,
             )
 
-            resp = client.send(probe_endpoint, auth_context=auth_context)
+            path_params = {name: "1" for name in endpoint.path_param_names()} or None
+            resp = client.send(probe_endpoint, auth_context, path_params=path_params)
 
             if resp is None:
                 continue

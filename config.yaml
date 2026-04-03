@@ -32,31 +32,28 @@ endpoint_sources:
 
 checks:
   enabled:
-    - "missing_auth"
-    - "idor"
-    - "error_leakage"
+    - "auth"
+    - "bola"
+    - "error_leak"
     - "method_exposure"
-    - "rate_limit"
+    - "token_lifecycle"
 
-  missing_auth:
-    privileged_auth_names:
-      - "user"
-      - "admin"
+  # Options are flat because each check's run() reads directly
+  # from the top-level options dict (e.g. options.get("candidate_param_names"))
+  privileged_auth_names:
+    - "user"
+    - "admin"
 
-  idor:
-    candidate_param_names:
-      - "id"
-      - "userId"
-      - "accountId"
-      - "orderId"
-    test_values:
-      - "1"
-      - "2"
-      - "9999"
+  candidate_param_names:
+    - "id"
+    - "userId"
+    - "accountId"
+    - "orderId"
 
-  rate_limit:
-    attempts: 5
-    delay_ms: 250
+  test_values:
+    - "1"
+    - "2"
+    - "9999"
 
 reporting:
   format: "markdown"
