@@ -12,5 +12,4 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     e = EndPwnt("C:\\Users\\Happy\\Documents\\endpwnt\\openapi.yaml", "C:\\Users\\Happy\\Documents\\endpwnt\\config.yaml")
-    e.print_endpoints()
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

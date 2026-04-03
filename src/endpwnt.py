@@ -1,14 +1,20 @@
 from pathlib import Path
-from parse_config import *
-from typing import Any
-from endpoint import EndPoint
+import inspect
 import yaml
 
+from client import HttpClient
+from parse_config import *
+from typing import *
+from finding import Finding
+from endpoint import EndPoint
+import checks as checks_module
+from base_check import BaseCheck
 
 class EndPwnt:
     def __init__(self, openapi_path: str, config_path: str) -> None:
         self.endpoints = self._load_openapi(openapi_path)
         self.app_config = self._load_config(config_path)
+        self.checks_classes =  [obj for name, obj in inspect.getmembers(checks_module, inspect.isclass)]
 
     def _load_openapi(self, openapi_path: str) -> list[EndPoint]:
         try:
@@ -69,3 +75,16 @@ class EndPwnt:
             )
         except Exception as e:
             raise RuntimeError(f"Could not import config: {e}") from e
+
+    def run_scan(self) -> List[Finding]:
+        complete_findings : list[Finding] = []
+        client = HttpClient(self.app_config.base_url, self.app_config.timeouts.request_seconds, self.app_config.request_defaults.headers)
+        for endpoint in self.endpoints:
+            for cls in self.checks_classes:
+                obj:BaseCheck = cls()
+                if obj.applies_to(endpoint):
+                    complete_findings += obj.run(endpoint, client, self.app_config.auth_contexts, self.app_config.checks.options)
+                    complete_findings += obj.run_other_methods(endpoint, client, self.app_config.auth_contexts)
+
+
+        return complete_findings
