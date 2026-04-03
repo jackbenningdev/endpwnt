@@ -4,7 +4,7 @@ from typing import Any
 HTTP_METHODS = {"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"}
 
 @dataclass
-class Endpoint:
+class EndPoint:
     method: str
     path: str
     summary: str | None = None
