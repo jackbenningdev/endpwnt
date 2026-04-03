@@ -1,6 +1,7 @@
 from pathlib import Path
 from parse_config import *
 from typing import Any
+from endpoint import EndPoint
 import yaml
 
 
@@ -10,16 +11,11 @@ class EndPwnt:
             with open(Path(openapi_path), "r", encoding="utf-8") as f:
                 spec = yaml.safe_load(f)
 
-            self.endpoints : list[dict[str, str]] = []
+            self.endpoints : list[EndPoint] = []
 
             for path, methods in spec.get("paths", {}).items():
                 for method, details in methods.items():
-                    self.endpoints.append({
-                        "method": method.upper(),
-                        "path": path,
-                        "summary": details.get("summary"),
-                        "operationId": details.get("operationId"),
-                    })
+                    self.endpoints.append(EndPoint(method=method.upper(), path=path, summary=details.get("summary"), operation_id=details.get("operationId")))
 
         except Exception as e:
             print("ERROR: Could not import openAPI")

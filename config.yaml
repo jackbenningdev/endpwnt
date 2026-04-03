@@ -24,7 +24,7 @@ auth_contexts:
       sessionid: "abc123"
 
 endpoint_sources:
-  openapi: "openapi.json"
+  openapi: "openapi.yaml"
   include_paths: []
   exclude_paths:
     - "/health"
