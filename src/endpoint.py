@@ -5,5 +5,6 @@ from typing import Any
 class EndPoint:
     method: str
     path: str
-    summary: str
-    operation_id: str
+    summary: str | None = None
+    operation_id: str | None = None
+    parameters: list[dict[str, Any]] = field(default_factory=list)

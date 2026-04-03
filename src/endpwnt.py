@@ -11,11 +11,30 @@ class EndPwnt:
             with open(Path(openapi_path), "r", encoding="utf-8") as f:
                 spec = yaml.safe_load(f)
 
-            self.endpoints : list[EndPoint] = []
+            self.endpoints: list[EndPoint] = []
 
-            for path, methods in spec.get("paths", {}).items():
-                for method, details in methods.items():
-                    self.endpoints.append(EndPoint(method=method.upper(), path=path, summary=details.get("summary"), operation_id=details.get("operationId")))
+            for path, path_item in spec.get("paths", {}).items():
+                path_parameters = path_item.get("parameters", [])
+
+                for method, details in path_item.items():
+                    if method == "parameters":
+                        continue
+
+                    if method.lower() not in {"get", "post", "put", "patch", "delete", "options", "head"}:
+                        continue
+
+                    operation_parameters = details.get("parameters", [])
+                    all_parameters = path_parameters + operation_parameters
+
+                    self.endpoints.append(
+                        EndPoint(
+                            method=method.upper(),
+                            path=path,
+                            summary=details.get("summary"),
+                            operation_id=details.get("operationId"),
+                            parameters=all_parameters,
+                        )
+                    )
 
         except Exception as e:
             print("ERROR: Could not import openAPI")

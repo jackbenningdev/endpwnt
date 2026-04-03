@@ -3,7 +3,7 @@ from endpoint import EndPoint
 
 class AuthCheck(BaseCheck):
 
-    def applies_to(self, endpoint):
+    def applies_to(self, endpoint:EndPoint):
         PUBLICISH = ["/health", "/metrics", "/docs", "/openapi", "/login", "/register"]
         if any(x in endpoint.path.lower() for x in PUBLICISH):
             return False
@@ -15,7 +15,7 @@ class AuthCheck(BaseCheck):
 
 class BolaCheck(BaseCheck):
 
-    def applies_to(self, endpoint):
+    def applies_to(self, endpoint:EndPoint):
         ID_NAMES = ["id", "userid", "accountid", "orderid", "profileid"]
         for param in endpoint.parameters:
             if param.get("name", "").lower() in ID_NAMES:
@@ -27,21 +27,22 @@ class BolaCheck(BaseCheck):
 
 
 class MethodExposureCheck(BaseCheck):
-    def applies_to(self, endpoint):
+    def applies_to(self, endpoint:EndPoint):
         return endpoint.method in {"GET", "POST"}
 
     def run(self, endpoint, client, auth_contexts):
         pass
 
 class ErrorLeakCheck(BaseCheck):
-    def applies_to(self, endpoint):
+    def applies_to(self, endpoint:EndPoint):
         return True
 
     def run(self, endpoint, client, auth_contexts):
         pass
 
+
 class TokenLifeCycleCheck(BaseCheck):
-    def applies_to(self, endpoint):
+    def applies_to(self, endpoint:EndPoint):
         path = endpoint.path.lower()
         return any(x in path for x in ["refresh", "logout", "token", "session", "auth"])
 
