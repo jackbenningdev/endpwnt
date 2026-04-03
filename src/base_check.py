@@ -4,13 +4,15 @@ from client import HttpClient
 
 class BaseCheck(ABC):
 
-    @abstractmethod
-    def applies_to(self, endpoint) -> bool:
-        pass
+    check_id = "base"
 
     @abstractmethod
-    def run(self, endpoint:EndPoint, client:HttpClient, auth_contexts) -> list:
-        pass
+    def applies_to(self, endpoint: EndPoint) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def run(self, endpoint: EndPoint, client, auth_contexts, options: dict) -> bool:
+        raise NotImplementedError
 
     def run_other_methods(self, endpoint:EndPoint, client:HttpClient, auth_context):
         findings = []

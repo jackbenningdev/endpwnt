@@ -14,9 +14,17 @@ class HttpClient:
         self.session.headers.update(default_headers or {})
         self.session.verify = verify_tls
 
-    def send(self, endpoint, auth_context=None, params=None, json_body=None, data=None):
-        url = f"{self.base_url}{endpoint.path}"
-
+    def send(
+        self,
+        endpoint,
+        auth_context=None,
+        *,
+        path_params: dict[str, str] | None = None,
+        query_params: dict[str, str] | None = None,
+        json_body=None,
+        data=None,
+    ):
+        url = f"{self.base_url}{endpoint.format_path(path_params)}"
         headers = {}
         cookies = {}
 
@@ -30,12 +38,11 @@ class HttpClient:
                 url=url,
                 headers=headers,
                 cookies=cookies,
-                params=params,
+                params=query_params,
                 json=json_body,
                 data=data,
                 timeout=self.timeout,
                 allow_redirects=False,
             )
-        except requests.RequestException as e:
-            print("Request failed: " + str(e))
+        except requests.RequestException:
             return None
