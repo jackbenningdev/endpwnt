@@ -1,4 +1,4 @@
-base_url: "https://target.local"
+base_url: "http://localhost:8888"
 
 timeouts:
   request_seconds: 10
