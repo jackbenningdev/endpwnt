@@ -116,7 +116,7 @@ The HTML report includes:
 - Severity doughnut + check-type bar chart
 - Per-endpoint finding distribution
 - Expandable finding cards with evidence and a remediation recommendation
-
+![Description](assets/cli.png)
 ![Description](assets/output.png)
 
 
