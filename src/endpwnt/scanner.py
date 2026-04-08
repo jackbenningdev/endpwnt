@@ -20,10 +20,11 @@ from endpwnt.parse_config import (
 )
 
 class EndPwnt:
-    def __init__(self, openapi_path: str, config_path: str) -> None:
+    def __init__(self, config_path: str) -> None:
         self.app_config = self._load_config(config_path)
+        openapi_path = Path(config_path).parent / self.app_config.endpoint_sources.openapi
         exclude = self.app_config.endpoint_sources.exclude_paths
-        self.endpoints = [ep for ep in self._load_openapi(openapi_path) if ep.path not in exclude]
+        self.endpoints = [ep for ep in self._load_openapi(str(openapi_path)) if ep.path not in exclude]
         self.checks_classes = [
             obj for _, obj in inspect.getmembers(checks_module, inspect.isclass)
             if issubclass(obj, BaseCheck) and obj is not BaseCheck

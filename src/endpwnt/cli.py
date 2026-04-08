@@ -20,12 +20,6 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Path to the endpwnt YAML config file.",
     )
     parser.add_argument(
-        "--spec",
-        required=True,
-        type=Path,
-        help="Path to the OpenAPI spec file (YAML).",
-    )
-    parser.add_argument(
         "--output",
         type=Path,
         default=Path("report.html"),
@@ -43,7 +37,7 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
 
-    scanner = EndPwnt(openapi_path=str(args.spec), config_path=str(args.config))
+    scanner = EndPwnt(config_path=str(args.config))
     findings = scanner.run_scan()
 
     HtmlReporter(findings).write(str(args.output))
