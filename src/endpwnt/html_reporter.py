@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import List
 
-from finding import Finding
+from endpwnt.finding import Finding
 
 
 _SEV_COLORS = {"high": "#E24B4A", "medium": "#BA7517", "low": "#639922"}

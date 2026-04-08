@@ -1,6 +1,6 @@
-from base_check import BaseCheck
-from endpoint import EndPoint
-from finding import Finding
+from endpwnt.base_check import BaseCheck
+from endpwnt.endpoint import EndPoint
+from endpwnt.finding import Finding
 
 
 def _default_path_params(endpoint: EndPoint) -> dict[str, str] | None:

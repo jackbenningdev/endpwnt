@@ -2,13 +2,22 @@ from pathlib import Path
 import inspect
 import yaml
 
-from client import HttpClient
-from parse_config import *
-from typing import *
-from finding import Finding
-from endpoint import EndPoint
-import checks as checks_module
-from base_check import BaseCheck
+from typing import List
+
+from endpwnt import checks as checks_module
+from endpwnt.base_check import BaseCheck
+from endpwnt.client import HttpClient
+from endpwnt.endpoint import EndPoint
+from endpwnt.finding import Finding
+from endpwnt.parse_config import (
+    AppConfig,
+    AuthContext,
+    ChecksConfig,
+    EndpointSourcesConfig,
+    ReportingConfig,
+    RequestDefaultsConfig,
+    TimeoutsConfig,
+)
 
 class EndPwnt:
     def __init__(self, openapi_path: str, config_path: str) -> None:

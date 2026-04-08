@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from endpoint import EndPoint
-from client import HttpClient
-from typing import *
+from typing import List
+
+from endpwnt.client import HttpClient
+from endpwnt.endpoint import EndPoint
 
 class BaseCheck(ABC):
 
